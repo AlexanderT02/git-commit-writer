@@ -383,6 +383,19 @@ describe("CLI commands", () => {
       expect(printed).toContain("Active provider set to gemini");
     });
 
+    it("accepts google as an alias for gemini", async () => {
+      await runCommand(["provider", "set", "google"]);
+
+      expect(mockIsProviderName).toHaveBeenCalledWith("gemini");
+      expect(mockSetProvider).toHaveBeenCalledWith("gemini");
+
+      const printed = vi.mocked(console.log).mock.calls
+        .map((call) => String(call[0] ?? ""))
+        .join("\n");
+
+      expect(printed).toContain("Active provider set to gemini");
+    });
+
     it("sets active provider to openai", async () => {
       await runCommand(["provider", "set", "openai"]);
 
