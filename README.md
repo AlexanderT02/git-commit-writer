@@ -13,7 +13,7 @@ Git Writer uses OpenAI by default, but the LLM provider is configurable. You can
 
 Use `gw --help` for the full command reference.
 
-[![node](https://img.shields.io/badge/node-%3E%3D22-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![node](https://img.shields.io/badge/node-%3E%3D24-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Conventional Commits](https://img.shields.io/badge/Conventional_Commits-1.0.0-FE5196?style=flat-square&logo=conventionalcommits&logoColor=white)](https://www.conventionalcommits.org/)
 
@@ -25,7 +25,7 @@ Use `gw --help` for the full command reference.
 
 ## Requirements
 
-- Node.js `>= 22`
+- Node.js `>= 24`
 - Git
 - One configured LLM provider:
   - OpenAI with an API key
@@ -63,6 +63,33 @@ setx OPENAI_API_KEY "your_api_key"
 ```
 
 Restart your terminal after using `setx`.
+
+### Use Google Gemini (free tier)
+
+Create a Gemini API key in [Google AI Studio](https://aistudio.google.com/app/apikey), then set it as `GEMINI_API_KEY`:
+
+```bash
+export GEMINI_API_KEY="your_api_key"
+gw provider set google
+```
+
+PowerShell:
+
+```powershell
+$env:GEMINI_API_KEY="your_api_key"
+gw provider set google
+```
+
+CMD:
+
+```cmd
+setx GEMINI_API_KEY "your_api_key"
+gw provider set google
+```
+
+`google` is a convenient alias for the internal `gemini` provider. Google offers a free tier for supported Gemini models, subject to its current rate limits. `GOOGLE_API_KEY` is also accepted for compatibility.
+
+Codex and the OpenAI API use different integration paths here: Git Writer already supports OpenAI through `OPENAI_API_KEY`, while a Codex CLI login is not used as an application API credential.
 
 Verify the CLI:
 
@@ -216,7 +243,7 @@ Git Writer supports multiple LLM providers through the provider layer in `src/ll
 The available providers and models are configured in:
 
 ```txt
-src/config/config.ts
+src/config/Config.ts
 ```
 
 Example:
@@ -255,6 +282,7 @@ Change the active provider:
 gw provider set openai
 gw provider set ollama
 gw provider set gemini
+gw provider set google
 ```
 
 The selected provider is stored in:

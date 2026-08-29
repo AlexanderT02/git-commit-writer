@@ -73,17 +73,18 @@ function validateGitRef(value: string): string {
 
 function validateProvider(value: string): LLMProviderName {
   const settings = new ProviderSettings();
-  const trimmed = value.trim();
+  const trimmed = value.trim().toLowerCase();
+  const provider = trimmed === "google" ? "gemini" : trimmed;
 
-  if (!settings.isProviderName(trimmed)) {
+  if (!settings.isProviderName(provider)) {
     throw new InvalidArgumentError(
       `Invalid provider "${value}". Expected one of: ${settings
         .availableProviders()
-        .join(", ")}`,
+        .join(", ")} (google is an alias for gemini)`,
     );
   }
 
-  return trimmed;
+  return provider;
 }
 
 function normalizeIssues(issues: string[]): string[] {
@@ -225,7 +226,7 @@ export function createProgram(): Command {
     .description("Set the active LLM provider")
     .argument(
       "<provider>",
-      "Provider name, e.g. openai, ollama or gemini",
+      "Provider name, e.g. openai, ollama, gemini or google",
       validateProvider,
     )
     .action((provider: LLMProviderName) => {

@@ -40,7 +40,7 @@ export class GeminiProvider extends BaseLLMProvider {
   constructor(private readonly config: LLMProviderConfig) {
     super();
 
-    const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 
     if (!apiKey) {
       throw new LLMProviderError(
@@ -114,40 +114,52 @@ export class GeminiProvider extends BaseLLMProvider {
     let fullText = "";
     let finalUsage: LLMUsage | undefined;
 
+    const consumeEvent = (event: string): void => {
+      const data = this.parseSseData(event);
+
+      if (!data || data === "[DONE]") {
+        return;
+      }
+
+      const chunk = JSON.parse(data) as GeminiGenerateResponse;
+
+      if (chunk.error) {
+        throw this.toGeminiError(chunk);
+      }
+
+      const delta = this.extractText(chunk);
+
+      if (delta.length > 0) {
+        fullText += delta;
+        onText(delta);
+      }
+
+      if (chunk.usageMetadata) {
+        finalUsage = this.mapUsage(chunk.usageMetadata);
+      }
+    };
+
     while (true) {
       const { value, done } = await reader.read();
 
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });
+      buffer = buffer.replace(/\r\n/g, "\n");
 
       const events = buffer.split("\n\n");
       buffer = events.pop() ?? "";
 
       for (const event of events) {
-        const data = this.parseSseData(event);
-
-        if (!data || data === "[DONE]") {
-          continue;
-        }
-
-        const chunk = JSON.parse(data) as GeminiGenerateResponse;
-
-        if (chunk.error) {
-          throw this.toGeminiError(chunk);
-        }
-
-        const delta = this.extractText(chunk);
-
-        if (delta.length > 0) {
-          fullText += delta;
-          onText(delta);
-        }
-
-        if (chunk.usageMetadata) {
-          finalUsage = this.mapUsage(chunk.usageMetadata);
-        }
+        consumeEvent(event);
       }
+    }
+
+    buffer += decoder.decode();
+    buffer = buffer.replace(/\r\n/g, "\n");
+
+    if (buffer.trim()) {
+      consumeEvent(buffer);
     }
 
     return {

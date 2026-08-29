@@ -2,6 +2,9 @@
   "name": "git-writer",
   "version": "0.2.7",
   "description": "CLI to generate conventional commit messages and pull request descriptions from your Git changes using LLMs.",
+  "engines": {
+    "node": ">=24"
+  },
   "bin": {
     "git-writer": "dist/index.js",
     "gw": "dist/index.js"

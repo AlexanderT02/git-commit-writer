@@ -47,8 +47,8 @@ vi.mock("../src/config/Config.js", () => ({
           generationModel: "llama3.1",
         },
         gemini: {
-          reasoningModel: "gemini-2.5-flash",
-          generationModel: "gemini-2.5-flash-lite",
+          reasoningModel: "gemini-3.1-flash-lite",
+          generationModel: "gemini-3.1-flash-lite",
         },
       },
     },
@@ -118,8 +118,8 @@ describe("ProviderSettings", () => {
 
     expect(settings.getCurrent()).toEqual({
       provider: "gemini",
-      reasoningModel: "gemini-2.5-flash",
-      generationModel: "gemini-2.5-flash-lite",
+      reasoningModel: "gemini-3.1-flash-lite",
+      generationModel: "gemini-3.1-flash-lite",
     });
   });
 
@@ -157,8 +157,8 @@ describe("ProviderSettings", () => {
 
     expect(JSON.parse(fileStore.get(CONFIG_FILE) ?? "{}")).toEqual({
       provider: "gemini",
-      reasoningModel: "gemini-2.5-flash",
-      generationModel: "gemini-2.5-flash-lite",
+      reasoningModel: "gemini-3.1-flash-lite",
+      generationModel: "gemini-3.1-flash-lite",
     });
   });
 

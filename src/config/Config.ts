@@ -94,8 +94,8 @@ export const config: AppConfig = {
         generationModel: "llama3.1",
       },
       gemini: {
-        reasoningModel: "gemini-2.5-flash",
-        generationModel: "gemini-2.5-flash-lite",
+        reasoningModel: "gemini-3.1-flash-lite",
+        generationModel: "gemini-3.1-flash-lite",
       },
     },
   },
