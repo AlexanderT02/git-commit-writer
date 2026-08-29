@@ -6,7 +6,7 @@ It can generate:
 
 - [Conventional Commit](https://www.conventionalcommits.org/) messages from interactively selected or already staged files
 - Pull request titles and Markdown descriptions from branch diffs
-- GitHub pull requests when the GitHub CLI is installed and authenticated
+- GitHub pull requests via `gh`, or Bitbucket pull requests via a compatible `bb` CLI when the `origin` remote points to Bitbucket
 - Local usage statistics for generated output
 
 Git Writer uses OpenAI by default, but the LLM provider is configurable. You can switch to Ollama, Gemini, or add another provider.
@@ -31,7 +31,7 @@ Use `gw --help` for the full command reference.
   - OpenAI with an API key
   - Gemini with an API key
   - Ollama running locally with the configured model installed
-- GitHub CLI if you want to create pull requests from `gw pr`
+- GitHub CLI (`gh`) or a compatible Bitbucket CLI (`bb`) if you want to create pull requests from `gw pr`
 ---
 
 ## Install
@@ -172,14 +172,14 @@ You can:
 - continue to preview without pushing
 - cancel
 
-Copying the generated PR text does not require GitHub CLI checks. GitHub CLI checks only run when you choose to create the PR.
+Copying the generated PR text does not require a hosting CLI check. CLI checks only run when you choose to create or update the PR. For Bitbucket, the detected `bb` CLI is used for creation when the `origin` remote is a Bitbucket URL.
 
 ### PR actions
 
 After generation, you can:
 
 - copy the PR text
-- create the PR via GitHub CLI
+- create the PR via the detected hosting CLI (`gh` or `bb`)
 - cancel
 
 ---

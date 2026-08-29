@@ -82,6 +82,20 @@ describe("GitService", () => {
       expect(ctx.issue).toBe("#456");
     });
 
+    it("extracts Jira ticket keys and normalizes them to uppercase", () => {
+      mockedExecFileSync.mockReturnValue("feature/fin-123-login\n");
+      const svc = createService();
+      const ctx = svc.getCurrentBranchContext();
+      expect(ctx.issue).toBe("FIN-123");
+    });
+
+    it("extracts Jira ticket keys without a branch prefix", () => {
+      mockedExecFileSync.mockReturnValue("FIN-123\n");
+      const svc = createService();
+      const ctx = svc.getCurrentBranchContext();
+      expect(ctx.issue).toBe("FIN-123");
+    });
+
     it("returns null issue for branches without numbers", () => {
       mockedExecFileSync.mockReturnValue("main\n");
       const svc = createService();

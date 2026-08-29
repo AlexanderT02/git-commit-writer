@@ -51,13 +51,18 @@ export class GitService {
     );
   }
 
+  getRemoteUrl(remote = "origin"): string {
+    return this.runGitOrEmpty(["remote", "get-url", remote]);
+  }
+
   getCurrentBranchContext(): BranchContext {
     const branch = this.getCurrentBranch();
-    const issue = branch.match(/[/#-](\d{2,})/)?.[1];
+    const jiraIssue = branch.match(/([A-Za-z][A-Za-z0-9]*-\d+)/)?.[1];
+    const numericIssue = branch.match(/[/#-](\d{2,})/)?.[1];
 
     return {
       branch,
-      issue: issue ? `#${issue}` : null,
+      issue: jiraIssue ? jiraIssue.toUpperCase() : numericIssue ? `#${numericIssue}` : null,
     };
   }
 

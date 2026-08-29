@@ -95,9 +95,14 @@ export class CommitFlow {
   }
 
   private appendIssueRefs(message: string): string {
-    if (!this.deps.issueRefs.length) return message;
+    const branchIssue = this.deps.git.getCurrentBranchContext().issue;
+    const refs = [
+      ...new Set([...this.deps.issueRefs, ...(branchIssue ? [branchIssue] : [])]),
+    ];
 
-    return `${message}\n\nrefs ${this.deps.issueRefs.join(", ")}`;
+    if (!refs.length) return message;
+
+    return `${message}\n\nrefs ${refs.join(", ")}`;
   }
 
   private commit(

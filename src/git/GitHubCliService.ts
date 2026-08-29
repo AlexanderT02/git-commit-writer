@@ -14,6 +14,14 @@ export type CommandResult = {
 export class GitHubCLIService {
   constructor(private readonly git: GitService) {}
 
+  private isBitbucketRemote(): boolean {
+    return /bitbucket\.(org|com)[:/]/i.test(this.git.getRemoteUrl());
+  }
+
+  private cliCommand(): "gh" | "bb" {
+    return this.isBitbucketRemote() ? "bb" : "gh";
+  }
+
   private run(command: string, args: string[]): CommandResult {
     const result = spawnSync(command, args, {
       encoding: "utf8",
@@ -32,14 +40,15 @@ export class GitHubCLIService {
   }
 
   private extractUrl(text: string): string | null {
-    return text.match(/https:\/\/github\.com\/[^\s]+/)?.[0] ?? null;
+    return text.match(/https:\/\/(?:github\.com|bitbucket\.org)\/[^\s]+/)?.[0] ?? null;
   }
 
   isGitHubCliInstalled(): boolean {
-    return this.run("gh", ["--version"]).status === 0;
+    return this.run(this.cliCommand(), ["--version"]).status === 0;
   }
 
   isGitHubCliAuthenticated(): boolean {
+    if (this.isBitbucketRemote()) return true;
     return this.run("gh", ["auth", "status"]).status === 0;
   }
 
@@ -48,7 +57,9 @@ export class GitHubCLIService {
       return {
         status: "gh_missing",
         message:
-          "GitHub CLI is not installed or not available in PATH. Install it from https://cli.github.com/.",
+          this.isBitbucketRemote()
+            ? "Bitbucket CLI (bb) is not installed or not available in PATH. Install a compatible bb CLI first."
+            : "GitHub CLI is not installed or not available in PATH. Install it from https://cli.github.com/.",
       };
     }
 
@@ -111,6 +122,7 @@ export class GitHubCLIService {
   }
 
   getExistingPullRequest(baseBranch: string): ExistingPullRequest | null {
+    if (this.isBitbucketRemote()) return null;
     const normalizedBaseBranch = this.normalizeBaseBranch(baseBranch);
     const currentBranch = this.git.getCurrentBranch();
 
@@ -190,16 +202,26 @@ export class GitHubCLIService {
 
     const normalizedBaseBranch = this.normalizeBaseBranch(baseBranch);
 
-    const result = this.run("gh", [
-      "pr",
-      "create",
-      "--base",
-      normalizedBaseBranch,
-      "--title",
-      title,
-      "--body",
-      body,
-    ]);
+    const result = this.isBitbucketRemote()
+      ? this.run("bb", [
+        "pr",
+        "create",
+        normalizedBaseBranch,
+        "--title",
+        title,
+        "--description",
+        body,
+      ])
+      : this.run("gh", [
+        "pr",
+        "create",
+        "--base",
+        normalizedBaseBranch,
+        "--title",
+        title,
+        "--body",
+        body,
+      ]);
 
     if (result.status === 0) {
       return {
@@ -228,7 +250,9 @@ export class GitHubCLIService {
 
     return {
       status: "failed",
-      message: combinedOutput || "Failed to create pull request via GitHub CLI.",
+      message:
+        combinedOutput ||
+        `Failed to create pull request via ${this.isBitbucketRemote() ? "Bitbucket" : "GitHub"} CLI.`,
     };
   }
 
@@ -237,6 +261,13 @@ export class GitHubCLIService {
     title: string,
     body: string,
   ): PullRequestUpdateResult {
+    if (this.isBitbucketRemote()) {
+      return {
+        status: "failed",
+        message:
+          "Updating an existing Bitbucket pull request is not supported by the detected bb CLI. Use the generated PR text or update it in Bitbucket.",
+      };
+    }
     const readinessError = this.getReadinessError();
 
     if (readinessError) {
