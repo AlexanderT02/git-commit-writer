@@ -13,7 +13,7 @@ Git Writer uses OpenAI by default, but the LLM provider is configurable. You can
 
 Use `gw --help` for the full command reference.
 
-[![node](https://img.shields.io/badge/node-%3E%3D22-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![node](https://img.shields.io/badge/node-%3E%3D24-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Conventional Commits](https://img.shields.io/badge/Conventional_Commits-1.0.0-FE5196?style=flat-square&logo=conventionalcommits&logoColor=white)](https://www.conventionalcommits.org/)
 
@@ -25,7 +25,7 @@ Use `gw --help` for the full command reference.
 
 ## Requirements
 
-- Node.js `>= 22`
+- Node.js `>= 24`
 - Git
 - One configured LLM provider:
   - OpenAI with an API key
