@@ -193,11 +193,11 @@ export class UI {
     const actionChoices = hasExistingPR
       ? [
         { name: "Copy PR to clipboard", value: "copy" as const },
-        { name: "Update existing PR via GitHub CLI", value: "update" as const },
+        { name: "Update existing PR via hosting CLI", value: "update" as const },
       ]
       : [
         { name: "Copy PR to clipboard", value: "copy" as const },
-        { name: "Create PR via GitHub CLI", value: "create" as const },
+        { name: "Create PR via hosting CLI", value: "create" as const },
       ];
 
     return select<"copy" | "create" | "update" | "cancel">({
